@@ -18,7 +18,14 @@
   <div id="map"></div>
 
   <script>
-    const map = L.map('map').setView([51.505, -0.09], 2);
+    const map = L.map('map', {
+      center: [51.505, -0.09],
+      zoom: 2,
+      preferCanvas: true,
+      zoomControl: false
+    });
+
+    new L.Control.Zoom({ position: 'topright' }).addTo(map)
 
     L.tileLayer('/map/tiles/{z}/{x}/{y}.jpg', {
       minZoom: 1,
