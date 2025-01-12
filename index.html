@@ -23,7 +23,9 @@
       zoom: 2,
       preferCanvas: true,
       zoomControl: false
-    });
+    })
+    
+    map._onResize();
 
     new L.Control.Zoom({ position: 'topright' }).addTo(map)
 
