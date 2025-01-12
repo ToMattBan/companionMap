@@ -702,13 +702,13 @@
       }
     }
 
-    readFromBrowser();
-
     addMarkers(markersGroup);
+
+    readFromBrowser();
 
     var markerTarget = null;
 
-    function toggleCollected(type, index) {
+    function toggleCollected(type, index, justOpened = false) {
       if (!markerTarget) {
         console.error('No marker target');
         return;
@@ -723,7 +723,7 @@
         markerTarget.classList.remove('icon-collected')
       }
 
-      saveToBrowser();
+      if (!justOpened) saveToBrowser();
     }
 
     function addMarkers(markersGroup) {
@@ -810,7 +810,10 @@
         
         Object.keys(markersToGet).forEach(markerType => {
           markersToGet[markerType].forEach((collected, index) => {
-            markersGroup[markerType].markers[index].collected = collected;
+            if (collected === true) {
+              markerTarget = document.querySelector(`.${markerType}-icon[title^="${index + 1}"]`);
+              toggleCollected(markerType, index, true);
+            }
           })
         })
       }
