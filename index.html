@@ -34,7 +34,7 @@
       attribution: 'Maps from <a href="https://www.worldofgothic.com/">World of Gothic</a> | Markers from <a href="https://www.xboxachievements.com/forum/topic/239955-arcania-gothic-4-collectables-guide/">Xbox Achievements</a> | Made with <a href="https://leafletjs.com">Leaflet</a>'
     }).addTo(map);
 
-    const iconSize = [30, 30]
+    const iconSize = [30, 30];
 
     const icons = {
       adanos: L.icon({
@@ -702,6 +702,8 @@
       }
     }
 
+    readFromBrowser();
+
     addMarkers(markersGroup);
 
     var markerTarget = null;
@@ -720,6 +722,8 @@
       } else {
         markerTarget.classList.remove('icon-collected')
       }
+
+      saveToBrowser();
     }
 
     function addMarkers(markersGroup) {
@@ -782,6 +786,34 @@
         })
       })
 
+    }
+  
+    function saveToBrowser() {
+      const markersToSave = {
+        "adanos": [],
+        "beliar": [],
+        "innos": []
+      }
+
+      markersToSave.adanos = markersGroup.adanos.markers.map(mark => mark.collected);
+      markersToSave.beliar = markersGroup.beliar.markers.map(mark => mark.collected);
+      markersToSave.innos = markersGroup.innos.markers.map(mark => mark.collected);
+
+      localStorage.setItem('gothic_4_map', JSON.stringify(markersToSave));
+    }
+
+    async function readFromBrowser() {
+      let markersToGet = localStorage.getItem('gothic_4_map');
+      
+      if (markersToGet) {
+        markersToGet = JSON.parse(markersToGet);
+        
+        Object.keys(markersToGet).forEach(markerType => {
+          markersToGet[markerType].forEach((collected, index) => {
+            markersGroup[markerType].markers[index].collected = collected;
+          })
+        })
+      }
     }
   </script>
 
