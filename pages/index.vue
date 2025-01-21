@@ -1,5 +1,5 @@
 <template>
-  <img src="../assets/gothic_4/icons/adanos.webp">
+  <img src="../public/games_assets/gothic_4/icons/adanos.webp">
 </template>
 
 <script lang="ts" setup>
