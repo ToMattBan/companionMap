@@ -2,9 +2,8 @@ import * as L from 'leaflet';
 
 type TGame = 'gothic_4';
 
-const baseUrl = process.env.NODE_ENV === 'production' 
-  ? 'games_assets'
-  : '_nuxt/public/games_assets';
+const isProd = process.env.NODE_ENV === 'production'
+const baseUrl = isProd ? 'games_assets' : '_nuxt/public/games_assets';
 
 let map: L.Map;
 
@@ -17,6 +16,8 @@ function initMap() {
   })
 
   new L.Control.Zoom({ position: 'topright' }).addTo(map)
+
+  return map;
 }
 
 function setTileMap(game: TGame, attribuitions: string) {
@@ -39,14 +40,20 @@ function createIcon(game: TGame, name: string, size: L.PointTuple, className?: s
 }
 
 function createMarker(coord: L.PointTuple, icon: L.Icon, title: string) {
-  L.marker(coord, {
+  const marker = L.marker(coord, {
     icon,
     title,
     alt: title,
 
     riseOnHover: true,
     interactive: true
-  }).addTo(map);
+  })
+
+  marker.addTo(map);
+
+  const popup = L.popup().setLatLng(coord);
+
+  return { marker, popup };
 }
 
 export default {

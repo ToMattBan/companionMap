@@ -11,3 +11,30 @@ html, body {
 .leaflet-control-attribution a[title="A JavaScript library for interactive maps"]~span {
   display: none;
 }
+
+.leaflet-popup-content {
+  margin: 0
+}
+
+.leaflet-popup-content .instructions {
+  margin: 13px 24px 13px 20px;
+}
+
+.leaflet-popup-content hr {
+  margin-bottom: 0;
+}
+
+.leaflet-popup-content .collectedButton {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 10px 0;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.icon-collected {
+  opacity: 0.3;
+}
