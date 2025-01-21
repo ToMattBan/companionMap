@@ -3,7 +3,11 @@
 </template>
 
 <script lang="ts" setup>
-import mapUtils from '../utils/map';
+import mapUtils from '@/utils/map';
+
+import adanosMarkers from '@/assets/markers/gothic_4/adanos'
+import beliarMarkers from '@/assets/markers/gothic_4/beliar'
+import innosMarkers from '@/assets/markers/gothic_4/innos'
 
 const attribuitions: string[] = [
   'Maps from <a href="https://www.worldofgothic.com/">World of Gothic</a>',
@@ -17,11 +21,14 @@ onMounted(async () => {
   mapUtils.initMap();
   mapUtils.setTileMap('gothic_4', attribuitions.join(' | '));
 
-  const icons = {
-    adanos: mapUtils.createIcon('gothic_4', 'adanos.webp', iconSize, 'adanos-icon'),
-    innos: mapUtils.createIcon('gothic_4', 'innos.webp', iconSize, 'innos-icon'),
-    beliar: mapUtils.createIcon('gothic_4', 'beliar.webp', iconSize, 'beliar-icon')
-  }
+  const adanosIcon = mapUtils.createIcon('gothic_4', 'adanos.webp', iconSize, 'adanos-icon');
+  adanosMarkers.forEach(marker => mapUtils.createMarker(marker.coord, adanosIcon, marker.title)); 
+  
+  const beliarIcon = mapUtils.createIcon('gothic_4', 'beliar.webp', iconSize, 'beliar-icon');
+  beliarMarkers.forEach(marker => mapUtils.createMarker(marker.coord, beliarIcon, marker.title));
+
+  const innosIcon = mapUtils.createIcon('gothic_4', 'innos.webp', iconSize, 'innos-icon');
+  innosMarkers.forEach(marker => mapUtils.createMarker(marker.coord, innosIcon, marker.title)); 
 })
 </script>
 
