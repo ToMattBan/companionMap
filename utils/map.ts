@@ -3,7 +3,7 @@ import * as L from 'leaflet';
 type TGame = 'gothic_4';
 
 const baseUrl = process.env.NODE_ENV === 'production' 
-  ? ''
+  ? 'games_assets'
   : '_nuxt/public/games_assets/';
 
 let map: L.Map;
