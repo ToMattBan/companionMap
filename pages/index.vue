@@ -1,5 +1,5 @@
 <template>
-  <div id="map"></div>
+  <img src="../assets/gothic_4/icons/adanos.webp">
 </template>
 
 <script lang="ts" setup>
@@ -14,14 +14,14 @@ const attribuitions: string[] = [
 const iconSize: L.PointTuple = [25, 25];
 
 onMounted(async () => {
-  mapUtils.initMap();
+  /* mapUtils.initMap();
   mapUtils.setTileMap('gothic_4', attribuitions.join(' | '));
 
   const icons = {
     adanos: mapUtils.createIcon('gothic_4', 'adanos.webp', iconSize, 'adanos-icon'),
     innos: mapUtils.createIcon('gothic_4', 'innos.webp', iconSize, 'innos-icon'),
     beliar: mapUtils.createIcon('gothic_4', 'beliar.webp', iconSize, 'beliar-icon')
-  }
+  } */
 })
 </script>
 
