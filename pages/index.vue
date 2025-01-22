@@ -4,13 +4,16 @@
 
 <script lang="ts" setup>
 import type { IMarkers } from '~/interfaces/map';
+import pouchdb from 'pouchdb';
 import mapUtils from '@/utils/map';
 
 import markAdanos from '@/assets/markers/gothic_4/adanos'
 import markBeliar from '@/assets/markers/gothic_4/beliar'
 import markInnos from '@/assets/markers/gothic_4/innos'
 
-import pouchdb from 'pouchdb';
+const adanosMarkers = ref<IMarkers[]>(markAdanos);
+const beliarMarkers = ref<IMarkers[]>(markBeliar);
+const innosMarkers = ref<IMarkers[]>(markInnos);
 
 const attribuitions: string[] = [
   'Maps from <a href="https://www.worldofgothic.com/">World of Gothic</a>',
@@ -21,11 +24,8 @@ const attribuitions: string[] = [
 const iconSize: L.PointTuple = [25, 25];
 let map: L.Map;
 
-const adanosMarkers = ref<IMarkers[]>(markAdanos);
 let adanosDB: { id: string, rev: string };
-const beliarMarkers = ref<IMarkers[]>(markBeliar);
 let beliarDB: { id: string, rev: string };
-const innosMarkers = ref<IMarkers[]>(markInnos);
 let innosMDB: { id: string, rev: string };
 
 const db = new pouchdb('gothic_4');
@@ -37,18 +37,17 @@ onMounted(async () => {
   mapUtils.setTileMap('gothic_4', attribuitions.join(' | '));
 
   const adanosIcon = mapUtils.createIcon('gothic_4', 'adanos.webp', iconSize, 'adanos-icon');
-  adanosMarkers.value.forEach((marker, index) => createMarker(marker, adanosIcon, index));
+  adanosMarkers.value.forEach(marker => createMarker(marker, adanosIcon));
 
   const beliarIcon = mapUtils.createIcon('gothic_4', 'beliar.webp', iconSize, 'beliar-icon');
-  beliarMarkers.value.forEach((marker, index) => createMarker(marker, beliarIcon, index));
+  beliarMarkers.value.forEach(marker => createMarker(marker, beliarIcon));
 
   const innosIcon = mapUtils.createIcon('gothic_4', 'innos.webp', iconSize, 'innos-icon');
-  innosMarkers.value.forEach((marker, index) => createMarker(marker, innosIcon, index));
+  innosMarkers.value.forEach(marker => createMarker(marker, innosIcon));
 })
 
 async function startDB() {
   const items = await db.allDocs({ descending: true, include_docs: true })
-
 
   if (items.total_rows === 0) {
     adanosDB = await db.put({ _id: "adanosMarkers", title: "adanosMarkers", markers: adanosMarkers.value })
@@ -79,34 +78,40 @@ async function startDB() {
 }
 
 async function updateDB() {
-  db.put({ _id: adanosDB.id, _rev: adanosDB.rev, markers: adanosMarkers.value });
-  db.put({ _id: beliarDB.id, _rev: beliarDB.rev, markers: beliarMarkers.value });
-  db.put({ _id: innosMDB.id, _rev: innosMDB.rev, markers: innosMarkers.value });
+  adanosDB = await db.put({ _id: adanosDB.id, _rev: adanosDB.rev, markers: adanosMarkers.value });
+  beliarDB = await db.put({ _id: beliarDB.id, _rev: beliarDB.rev, markers: beliarMarkers.value });
+  innosMDB = await db.put({ _id: innosMDB.id, _rev: innosMDB.rev, markers: innosMarkers.value });
 }
 
 function createMarker(markerDetails: IMarkers, icon: L.Icon) {
   const { marker, popup } = mapUtils.createMarker(markerDetails.coord, icon, markerDetails.title);
 
   marker.on('click', () => {
-    popup.setContent(`
-      <div class="instructions">${markerDetails.instructions}</div>
-      <hr class="divider" />
-      <label role="button" class="collectedButton">
-        <input 
-          type="checkbox" id="collectedInput"
-          ${markerDetails.collected ? 'checked' : ''} 
-        />
-        Collected
-      </label>
-    `)
+    handleMarkerClick(markerDetails, popup)
+  })
+}
 
-    popup.openOn(map);
+function handleMarkerClick(markerDetails: IMarkers, popup: L.Popup) {
+  popup.setContent(`
+    <div class="instructions">${markerDetails.instructions}</div>
+    <hr class="divider" />
+    <label role="button" class="collectedButton">
+      <input 
+        type="checkbox" id="collectedInput"
+        ${markerDetails.collected ? 'checked' : ''} 
+      />
+      Collected
+    </label>
+  `)
 
-    const button = document.querySelector('#collectedInput');
-    button!.addEventListener('input', () => {
-      markerDetails.collected = !markerDetails.collected
-      updateDB()
-    })
+  popup.openOn(map);
+
+  const allCheckes = document.querySelectorAll('#collectedInput');
+  const button = allCheckes[allCheckes.length - 1];
+
+  button!.addEventListener('input', () => {
+    markerDetails.collected = !markerDetails.collected
+    updateDB()
   })
 }
 </script>
