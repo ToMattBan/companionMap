@@ -22,6 +22,7 @@ const attribuitions: string[] = [
 ];
 
 const iconSize: L.PointTuple = [25, 25];
+const collectedOpacity: number = 0.5;
 let map: L.Map;
 
 let adanosDB: { id: string, rev: string };
@@ -57,18 +58,21 @@ async function startDB() {
     items.rows.forEach(row => {
 
       if (row.id === 'adanosMarkers') {
+        // @ts-ignore: Markers does exist, but not on the type
         adanosMarkers.value = row.doc!.markers;
         adanosDB = { id: row.doc!._id, rev: row.doc!._rev };
         return;
       }
 
       if (row.id === 'beliarMarkers') {
+        // @ts-ignore: Markers does exist, but not on the type
         beliarMarkers.value = row.doc!.markers;
         beliarDB = { id: row.doc!._id, rev: row.doc!._rev };
         return;
       }
 
       if (row.id === 'innosMarkers') {
+        // @ts-ignore: Markers does exist, but not on the type
         innosMarkers.value = row.doc!.markers;
         innosMDB = { id: row.doc!._id, rev: row.doc!._rev };
         return;
@@ -86,12 +90,13 @@ async function updateDB() {
 function createMarker(markerDetails: IMarkers, icon: L.Icon) {
   const { marker, popup } = mapUtils.createMarker(markerDetails.coord, icon, markerDetails.title);
 
+  marker.setOpacity(markerDetails.collected ? collectedOpacity : 1);
   marker.on('click', () => {
-    handleMarkerClick(markerDetails, popup)
+    handleMarkerClick(markerDetails, popup, marker)
   })
 }
 
-function handleMarkerClick(markerDetails: IMarkers, popup: L.Popup) {
+function handleMarkerClick(markerDetails: IMarkers, popup: L.Popup, marker: L.Marker) {
   popup.setContent(`
     <div class="instructions">${markerDetails.instructions}</div>
     <hr class="divider" />
@@ -110,8 +115,11 @@ function handleMarkerClick(markerDetails: IMarkers, popup: L.Popup) {
   const button = allCheckes[allCheckes.length - 1];
 
   button!.addEventListener('input', () => {
-    markerDetails.collected = !markerDetails.collected
-    updateDB()
+    markerDetails.collected = !markerDetails.collected;
+    
+    marker.setOpacity(markerDetails.collected ? collectedOpacity : 1);
+
+    updateDB();
   })
 }
 </script>
