@@ -9,7 +9,7 @@ let map: L.Map;
 
 function initMap() {
   map = L.map('map', {
-    center: [51.505, -0.09],
+    center: [11.505, -0.09],
     zoom: 2,
     preferCanvas: true,
     zoomControl: false
