@@ -12,8 +12,8 @@ import markBeliar from '@/assets/markers/gothic_4/beliar'
 import markInnos from '@/assets/markers/gothic_4/innos'
 
 const attribuitions: string[] = [
-  'Maps from <a target="_blank" rel="noopener noreferrer" href="https://www.worldofgothic.com/">World of Gothic</a>',
   'Markers from <a target="_blank" rel="noopener noreferrer" href="https://www.xboxachievements.com/forum/topic/239955-arcania-gothic-4-collectables-guide/">Xbox Achievements</a>',
+  'Maps from <a target="_blank" rel="noopener noreferrer" href="https://www.worldofgothic.com/">World of Gothic</a>',
   'Made with <a target="_blank" rel="noopener noreferrer" href="https://leafletjs.com">Leaflet</a>'
 ];
 
@@ -52,21 +52,33 @@ async function startDB() {
 
   if (items.total_rows === 0) {
     Object.keys(markersMapping).forEach(async (key) => {
-      markersMapping[key].dbase = await db.put({ _id: key, title: key, markers: markersMapping[key].markers })
+      const collectedMarkers = markersMapping[key].markers.map(marker => marker.collected)
+
+      markersMapping[key].dbase = await db.put({ _id: key, title: key, markers: collectedMarkers })
     })
   } else {
     items.rows.forEach(row => {
-      // @ts-ignore: Markers does exist, but not on the type
-      markersMapping[row.id].markers = row.doc!.markers;
-      markersMapping[row.id].dbase = { id: row.doc!._id, rev: row.doc!._rev };
-    })
+      const mapping = markersMapping[row.id];
+      if (!mapping) return;
+
+      mapping.markers.forEach((marker, index) => {
+        // @ts-ignore: Markers does exist, but not on the type
+        marker.collected = row.doc!.markers[index];
+      });
+
+      mapping.dbase = { id: row.doc!._id, rev: row.doc!._rev };
+    });
   }
 }
 
 async function updateDB() {
-  Object.values(markersMapping).forEach(async ({ dbase, markers }) => {
-    dbase = await db.put({ _id: dbase.id, _rev: dbase.rev, markers })
-  })
+  Object.values(markersMapping).forEach(async (mapping) => {
+    const { dbase, markers } = mapping;
+    const collectedMarkers = markers.map(marker => marker.collected);
+
+    mapping.dbase = await db.put({ _id: dbase.id, _rev: dbase.rev, markers: collectedMarkers });
+  });
+
 }
 
 function createMap() {
