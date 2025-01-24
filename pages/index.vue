@@ -44,24 +44,7 @@ const db = new pouchdb('gothic_4');
 onMounted(async () => {
   await startDB();
 
-  if (!map) map = mapUtils.initMap();
-  const layerNormal = mapUtils.setTileMap('gothic_4', attribuitions.join(' | '));
-  const layerUnderground = mapUtils.setTileMap('gothic_4', attribuitions.join(' | '), 'under');
-  
-  layerNormal.addTo(map);
-
-  const layers = {
-    "Normal Map": layerNormal,
-    "Underground Map": layerUnderground,
-  }
-
-  mapUtils.createLayerControl(layers);
-
-  Object.values(markersMapping).forEach(({ name, markers }) => {
-    const icon = mapUtils.createIcon('gothic_4', `${name}.webp`, iconSize);
-
-    markers.forEach((marker, index) => createMarker(marker, icon, index));
-  })
+  createMap();
 })
 
 async function startDB() {
@@ -83,6 +66,27 @@ async function startDB() {
 async function updateDB() {
   Object.values(markersMapping).forEach(async ({ dbase, markers }) => {
     dbase = await db.put({ _id: dbase.id, _rev: dbase.rev, markers })
+  })
+}
+
+function createMap() {
+  if (!map) map = mapUtils.initMap();
+  const layerNormal = mapUtils.setTileMap('gothic_4', attribuitions.join(' | '));
+  const layerUnderground = mapUtils.setTileMap('gothic_4', attribuitions.join(' | '), 'under');
+
+  layerNormal.addTo(map);
+
+  const layers = {
+    "Normal Map": layerNormal,
+    "Underground Map": layerUnderground,
+  }
+
+  mapUtils.createLayerControl(layers);
+
+  Object.values(markersMapping).forEach(({ name, markers }) => {
+    const icon = mapUtils.createIcon('gothic_4', `${name}.webp`, iconSize);
+
+    markers.forEach((marker, index) => createMarker(marker, icon, index));
   })
 }
 
