@@ -11,10 +11,6 @@ import markAdanos from '@/assets/markers/gothic_4/adanos'
 import markBeliar from '@/assets/markers/gothic_4/beliar'
 import markInnos from '@/assets/markers/gothic_4/innos'
 
-const adanosMarkers = ref<IMarkers[]>(markAdanos);
-const beliarMarkers = ref<IMarkers[]>(markBeliar);
-const innosMarkers = ref<IMarkers[]>(markInnos);
-
 const attribuitions: string[] = [
   'Maps from <a target="_blank" rel="noopener noreferrer" href="https://www.worldofgothic.com/">World of Gothic</a>',
   'Markers from <a target="_blank" rel="noopener noreferrer" href="https://www.xboxachievements.com/forum/topic/239955-arcania-gothic-4-collectables-guide/">Xbox Achievements</a>',
@@ -24,6 +20,10 @@ const attribuitions: string[] = [
 const iconSize: L.PointTuple = [25, 25];
 const collectedOpacity: number = 0.5;
 let map: L.Map;
+
+let adanosMarkers: IMarkers[] = markAdanos;
+let beliarMarkers: IMarkers[] = markBeliar;
+let innosMarkers: IMarkers[] = markInnos;
 
 let adanosDB: { id: string, rev: string };
 let beliarDB: { id: string, rev: string };
@@ -38,42 +38,42 @@ onMounted(async () => {
   mapUtils.setTileMap('gothic_4', attribuitions.join(' | '));
 
   const adanosIcon = mapUtils.createIcon('gothic_4', 'adanos.webp', iconSize, 'adanos-icon');
-  adanosMarkers.value.forEach((marker, index) => createMarker(marker, adanosIcon, index));
+  adanosMarkers.forEach((marker, index) => createMarker(marker, adanosIcon, index));
 
   const beliarIcon = mapUtils.createIcon('gothic_4', 'beliar.webp', iconSize, 'beliar-icon');
-  beliarMarkers.value.forEach((marker, index) => createMarker(marker, beliarIcon, index));
+  beliarMarkers.forEach((marker, index) => createMarker(marker, beliarIcon, index));
 
   const innosIcon = mapUtils.createIcon('gothic_4', 'innos.webp', iconSize, 'innos-icon');
-  innosMarkers.value.forEach((marker, index) => createMarker(marker, innosIcon, index));
+  innosMarkers.forEach((marker, index) => createMarker(marker, innosIcon, index));
 })
 
 async function startDB() {
   const items = await db.allDocs({ descending: true, include_docs: true })
 
   if (items.total_rows === 0) {
-    adanosDB = await db.put({ _id: "adanosMarkers", title: "adanosMarkers", markers: adanosMarkers.value })
-    beliarDB = await db.put({ _id: "beliarMarkers", title: "beliarMarkers", markers: beliarMarkers.value })
-    innosMDB = await db.put({ _id: "innosMarkers", title: "innosMarkers", markers: innosMarkers.value })
+    adanosDB = await db.put({ _id: "adanosMarkers", title: "adanosMarkers", markers: adanosMarkers })
+    beliarDB = await db.put({ _id: "beliarMarkers", title: "beliarMarkers", markers: beliarMarkers })
+    innosMDB = await db.put({ _id: "innosMarkers", title: "innosMarkers", markers: innosMarkers })
   } else {
     items.rows.forEach(row => {
 
       if (row.id === 'adanosMarkers') {
         // @ts-ignore: Markers does exist, but not on the type
-        adanosMarkers.value = row.doc!.markers;
+        adanosMarkers = row.doc!.markers;
         adanosDB = { id: row.doc!._id, rev: row.doc!._rev };
         return;
       }
 
       if (row.id === 'beliarMarkers') {
         // @ts-ignore: Markers does exist, but not on the type
-        beliarMarkers.value = row.doc!.markers;
+        beliarMarkers = row.doc!.markers;
         beliarDB = { id: row.doc!._id, rev: row.doc!._rev };
         return;
       }
 
       if (row.id === 'innosMarkers') {
         // @ts-ignore: Markers does exist, but not on the type
-        innosMarkers.value = row.doc!.markers;
+        innosMarkers = row.doc!.markers;
         innosMDB = { id: row.doc!._id, rev: row.doc!._rev };
         return;
       }
@@ -82,9 +82,9 @@ async function startDB() {
 }
 
 async function updateDB() {
-  adanosDB = await db.put({ _id: adanosDB.id, _rev: adanosDB.rev, markers: adanosMarkers.value });
-  beliarDB = await db.put({ _id: beliarDB.id, _rev: beliarDB.rev, markers: beliarMarkers.value });
-  innosMDB = await db.put({ _id: innosMDB.id, _rev: innosMDB.rev, markers: innosMarkers.value });
+  adanosDB = await db.put({ _id: adanosDB.id, _rev: adanosDB.rev, markers: adanosMarkers });
+  beliarDB = await db.put({ _id: beliarDB.id, _rev: beliarDB.rev, markers: beliarMarkers });
+  innosMDB = await db.put({ _id: innosMDB.id, _rev: innosMDB.rev, markers: innosMarkers });
 }
 
 function createMarker(markerDetails: IMarkers, icon: L.Icon, index: number) {
