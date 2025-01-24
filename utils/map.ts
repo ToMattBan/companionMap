@@ -20,15 +20,24 @@ function initMap() {
   return map;
 }
 
-function setTileMap(game: TGame, attribuitions: string) {
-  const tilesUrl = `${baseUrl}/${game}/map/tiles/{z}/{x}/{y}.jpg`
+function setTileMap(game: TGame, attribuitions: string, modification?: string) {
+  const tiles = modification ? `tiles_${modification}` : 'tiles'
+  const tilesUrl = `${baseUrl}/${game}/map/${tiles}/{z}/{x}/{y}.jpg`
 
-  L.tileLayer(tilesUrl, {
+  const layer = L.tileLayer(tilesUrl, {
     minZoom: 1,
     maxZoom: 4,
     noWrap: true,
     attribution: attribuitions
-  }).addTo(map);
+  })
+
+  return layer;
+}
+
+function createLayerControl(layers: any) {
+  L.control.layers(layers)
+    .addTo(map)
+    .setPosition('topleft');
 }
 
 function createIcon(game: TGame, name: string, size: L.PointTuple, className?: string) {
@@ -60,6 +69,7 @@ function createMarker(coord: L.PointTuple, icon: L.Icon, title: string, index: n
 export default {
   initMap,
   setTileMap,
+  createLayerControl,
   createIcon,
   createMarker
 };
