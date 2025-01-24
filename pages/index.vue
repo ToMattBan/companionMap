@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { IMarkers } from '~/interfaces/map';
+import type { IMarkers, MarkersMapping } from '~/interfaces/map';
 import pouchdb from 'pouchdb';
 import mapUtils from '@/utils/map';
 
@@ -17,17 +17,27 @@ const attribuitions: string[] = [
   'Made with <a target="_blank" rel="noopener noreferrer" href="https://leafletjs.com">Leaflet</a>'
 ];
 
+const markersMapping: MarkersMapping = {
+  adanosMarkers: {
+    name: 'adanos',
+    markers: markAdanos,
+    dbase: { id: '', rev: '' },
+  },
+  beliarMarkers: {
+    name: 'beliar',
+    markers: markBeliar,
+    dbase: { id: '', rev: '' },
+  },
+  innosMarkers: {
+    name: 'innos',
+    markers: markInnos,
+    dbase: { id: '', rev: '' },
+  }
+};
+
 const iconSize: L.PointTuple = [25, 25];
 const collectedOpacity: number = 0.5;
 let map: L.Map;
-
-let adanosMarkers: IMarkers[] = markAdanos;
-let beliarMarkers: IMarkers[] = markBeliar;
-let innosMarkers: IMarkers[] = markInnos;
-
-let adanosDB: { id: string, rev: string };
-let beliarDB: { id: string, rev: string };
-let innosMDB: { id: string, rev: string };
 
 const db = new pouchdb('gothic_4');
 
@@ -37,54 +47,33 @@ onMounted(async () => {
   if (!map) map = mapUtils.initMap();
   mapUtils.setTileMap('gothic_4', attribuitions.join(' | '));
 
-  const adanosIcon = mapUtils.createIcon('gothic_4', 'adanos.webp', iconSize, 'adanos-icon');
-  adanosMarkers.forEach((marker, index) => createMarker(marker, adanosIcon, index));
+  Object.values(markersMapping).forEach(({ name, markers }) => {
+    const icon = mapUtils.createIcon('gothic_4', `${name}.webp`, iconSize);
 
-  const beliarIcon = mapUtils.createIcon('gothic_4', 'beliar.webp', iconSize, 'beliar-icon');
-  beliarMarkers.forEach((marker, index) => createMarker(marker, beliarIcon, index));
-
-  const innosIcon = mapUtils.createIcon('gothic_4', 'innos.webp', iconSize, 'innos-icon');
-  innosMarkers.forEach((marker, index) => createMarker(marker, innosIcon, index));
+    markers.forEach((marker, index) => createMarker(marker, icon, index));
+  })
 })
 
 async function startDB() {
   const items = await db.allDocs({ descending: true, include_docs: true })
 
   if (items.total_rows === 0) {
-    adanosDB = await db.put({ _id: "adanosMarkers", title: "adanosMarkers", markers: adanosMarkers })
-    beliarDB = await db.put({ _id: "beliarMarkers", title: "beliarMarkers", markers: beliarMarkers })
-    innosMDB = await db.put({ _id: "innosMarkers", title: "innosMarkers", markers: innosMarkers })
+    Object.keys(markersMapping).forEach(async (key) => {
+      markersMapping[key].dbase = await db.put({ _id: key, title: key, markers: markersMapping[key].markers })
+    })
   } else {
     items.rows.forEach(row => {
-
-      if (row.id === 'adanosMarkers') {
-        // @ts-ignore: Markers does exist, but not on the type
-        adanosMarkers = row.doc!.markers;
-        adanosDB = { id: row.doc!._id, rev: row.doc!._rev };
-        return;
-      }
-
-      if (row.id === 'beliarMarkers') {
-        // @ts-ignore: Markers does exist, but not on the type
-        beliarMarkers = row.doc!.markers;
-        beliarDB = { id: row.doc!._id, rev: row.doc!._rev };
-        return;
-      }
-
-      if (row.id === 'innosMarkers') {
-        // @ts-ignore: Markers does exist, but not on the type
-        innosMarkers = row.doc!.markers;
-        innosMDB = { id: row.doc!._id, rev: row.doc!._rev };
-        return;
-      }
+      // @ts-ignore: Markers does exist, but not on the type
+      markersMapping[row.id].markers = row.doc!.markers;
+      markersMapping[row.id].dbase = { id: row.doc!._id, rev: row.doc!._rev };
     })
   }
 }
 
 async function updateDB() {
-  adanosDB = await db.put({ _id: adanosDB.id, _rev: adanosDB.rev, markers: adanosMarkers });
-  beliarDB = await db.put({ _id: beliarDB.id, _rev: beliarDB.rev, markers: beliarMarkers });
-  innosMDB = await db.put({ _id: innosMDB.id, _rev: innosMDB.rev, markers: innosMarkers });
+  Object.values(markersMapping).forEach(async ({ dbase, markers }) => {
+    dbase = await db.put({ _id: dbase.id, _rev: dbase.rev, markers })
+  })
 }
 
 function createMarker(markerDetails: IMarkers, icon: L.Icon, index: number) {
@@ -116,7 +105,7 @@ function handleMarkerClick(markerDetails: IMarkers, popup: L.Popup, marker: L.Ma
 
   button!.addEventListener('input', () => {
     markerDetails.collected = !markerDetails.collected;
-    
+
     marker.setOpacity(markerDetails.collected ? collectedOpacity : 1);
 
     updateDB();
