@@ -16,9 +16,9 @@ const beliarMarkers = ref<IMarkers[]>(markBeliar);
 const innosMarkers = ref<IMarkers[]>(markInnos);
 
 const attribuitions: string[] = [
-  'Maps from <a href="https://www.worldofgothic.com/">World of Gothic</a>',
-  'Markers from <a href="https://www.xboxachievements.com/forum/topic/239955-arcania-gothic-4-collectables-guide/">Xbox Achievements</a>',
-  'Made with <a href="https://leafletjs.com">Leaflet</a>'
+  'Maps from <a target="_blank" rel="noopener noreferrer" href="https://www.worldofgothic.com/">World of Gothic</a>',
+  'Markers from <a target="_blank" rel="noopener noreferrer" href="https://www.xboxachievements.com/forum/topic/239955-arcania-gothic-4-collectables-guide/">Xbox Achievements</a>',
+  'Made with <a target="_blank" rel="noopener noreferrer" href="https://leafletjs.com">Leaflet</a>'
 ];
 
 const iconSize: L.PointTuple = [25, 25];
@@ -38,13 +38,13 @@ onMounted(async () => {
   mapUtils.setTileMap('gothic_4', attribuitions.join(' | '));
 
   const adanosIcon = mapUtils.createIcon('gothic_4', 'adanos.webp', iconSize, 'adanos-icon');
-  adanosMarkers.value.forEach(marker => createMarker(marker, adanosIcon));
+  adanosMarkers.value.forEach((marker, index) => createMarker(marker, adanosIcon, index));
 
   const beliarIcon = mapUtils.createIcon('gothic_4', 'beliar.webp', iconSize, 'beliar-icon');
-  beliarMarkers.value.forEach(marker => createMarker(marker, beliarIcon));
+  beliarMarkers.value.forEach((marker, index) => createMarker(marker, beliarIcon, index));
 
   const innosIcon = mapUtils.createIcon('gothic_4', 'innos.webp', iconSize, 'innos-icon');
-  innosMarkers.value.forEach(marker => createMarker(marker, innosIcon));
+  innosMarkers.value.forEach((marker, index) => createMarker(marker, innosIcon, index));
 })
 
 async function startDB() {
@@ -87,8 +87,8 @@ async function updateDB() {
   innosMDB = await db.put({ _id: innosMDB.id, _rev: innosMDB.rev, markers: innosMarkers.value });
 }
 
-function createMarker(markerDetails: IMarkers, icon: L.Icon) {
-  const { marker, popup } = mapUtils.createMarker(markerDetails.coord, icon, markerDetails.title);
+function createMarker(markerDetails: IMarkers, icon: L.Icon, index: number) {
+  const { marker, popup } = mapUtils.createMarker(markerDetails.coord, icon, markerDetails.title, index);
 
   marker.setOpacity(markerDetails.collected ? collectedOpacity : 1);
   marker.on('click', () => {

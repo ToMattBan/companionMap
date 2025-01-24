@@ -39,11 +39,12 @@ function createIcon(game: TGame, name: string, size: L.PointTuple, className?: s
   })
 }
 
-function createMarker(coord: L.PointTuple, icon: L.Icon, title: string) {
+function createMarker(coord: L.PointTuple, icon: L.Icon, title: string, index: number) {
+  index = index + 1;
   const marker = L.marker(coord, {
     icon,
-    title,
-    alt: title,
+    title: `${index} - ${title}`,
+    alt: `${index} - ${title}`,
 
     riseOnHover: true,
     interactive: true
