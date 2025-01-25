@@ -29,7 +29,7 @@ function setTileMap(game: TGame, attribuitions: string, modification?: string) {
     maxZoom: 4,
     noWrap: true,
     attribution: attribuitions
-  })
+  }).addTo(map)
 
   return layer;
 }
