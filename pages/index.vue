@@ -12,6 +12,7 @@ import markBeliar from '@/assets/markers/gothic_4/beliar'
 import markInnos from '@/assets/markers/gothic_4/innos'
 
 const attribuitions: string[] = [
+  'Video guide from <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/watch?v=Ei4UsJA4XMs&list=PLUrCwuoxYlm29kzLNNsUUxKy5f5l2_aRD/">LT_Sp0rk</a>',
   'Markers from <a target="_blank" rel="noopener noreferrer" href="https://www.xboxachievements.com/forum/topic/239955-arcania-gothic-4-collectables-guide/">Xbox Achievements</a>',
   'Maps from <a target="_blank" rel="noopener noreferrer" href="https://www.worldofgothic.com/">World of Gothic</a>',
   'Made with <a target="_blank" rel="noopener noreferrer" href="https://leafletjs.com">Leaflet</a>'
