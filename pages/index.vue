@@ -1,5 +1,9 @@
 <template>
   <div id="map" class="gothic_4_map"></div>
+  <div @click="toggleOpenExtras" :class="[{ 'open': openExtras }, 'destroy_db']">
+    <button @click="clearDB">Clear all markers</button>
+    <span>{{ openExtras ? '<' : '>' }}</span>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -10,6 +14,8 @@ import mapUtils from '@/utils/map';
 import markAdanos from '@/assets/markers/gothic_4/adanos'
 import markBeliar from '@/assets/markers/gothic_4/beliar'
 import markInnos from '@/assets/markers/gothic_4/innos'
+
+const openExtras = ref<boolean>(false);
 
 const attribuitions: string[] = [
   'Video guide from <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/watch?v=Ei4UsJA4XMs&list=PLUrCwuoxYlm29kzLNNsUUxKy5f5l2_aRD/">LT_Sp0rk</a>',
@@ -138,10 +144,54 @@ function handleMarkerClick(markerDetails: IMarkers, popup: L.Popup, marker: L.Ma
     updateDB();
   })
 }
+
+function toggleOpenExtras() {
+  openExtras.value = !openExtras.value;
+}
+
+async function clearDB() {
+  map.eachLayer((layer) => {
+    (layer as L.Marker).setOpacity(1)
+  })
+
+  for (const { dbase, markers } of Object.values(markersMapping)) {
+    markers.forEach(marker => marker.collected = false);
+
+    await db.remove({ _id: dbase.id, _rev: dbase.rev });
+  }
+
+  startDB();
+}
 </script>
 
-<style>
+<style scoped lang="scss">
 #map.gothic_4_map {
   background-color: black;
+  position: relative;
+
+  &~.destroy_db {
+    z-index: 400;
+    position: absolute;
+    bottom: 10px;
+    background-color: white;
+    border-radius: 2px;
+    display: flex;
+    transform: translateX(calc(-100% + 30px));
+    transition: all 0.4s ease;
+
+    &.open {
+      transform: none;
+    }
+
+    span {
+      width: 30px;
+      height: 30px;
+      line-height: 30px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  }
 }
 </style>
