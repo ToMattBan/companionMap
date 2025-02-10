@@ -1,8 +1,8 @@
 <template>
   <div id="map" class="gothic_4_map"></div>
-  <div @click="toggleOpenExtras" :class="[{ 'open': openExtras }, 'destroy_db']">
+  <div :class="[{ 'open': openExtras }, 'destroy_db']">
+    <span @click="toggleOpenExtras">{{ openExtras ? '>' : '<' }}</span>
     <button @click="clearDB">Clear all markers</button>
-    <span>{{ openExtras ? '<' : '>' }}</span>
   </div>
 </template>
 
@@ -172,11 +172,12 @@ async function clearDB() {
   &~.destroy_db {
     z-index: 400;
     position: absolute;
-    bottom: 10px;
+    right: 0;
+    bottom: 25px;
     background-color: white;
     border-radius: 2px;
     display: flex;
-    transform: translateX(calc(-100% + 30px));
+    transform: translateX(calc(100% - 30px));
     transition: all 0.4s ease;
 
     &.open {
@@ -191,6 +192,31 @@ async function clearDB() {
       font-size: 22px;
       font-weight: bold;
       cursor: pointer;
+    }
+
+    button {
+      background-color: white;
+      border: none;
+      border-left: 1px solid black;
+      cursor: pointer;
+
+      &:hover {
+        filter: brightness(0.8);
+      }
+    }
+  }
+
+  :deep(.leaflet-top.leaflet-right) {
+    display: grid;
+
+    .leaflet-control-zoom {
+      order: 2;
+      width: fit-content;
+      margin-left: auto;
+    }
+
+    .leaflet-control-layers {
+      order: 1;
     }
   }
 }

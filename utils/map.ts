@@ -37,7 +37,7 @@ function setTileMap(game: TGame, attribuitions: string, modification?: string) {
 function createLayerControl(layers: any) {
   L.control.layers(layers)
     .addTo(map)
-    .setPosition('topleft');
+    .setPosition('topright');
 }
 
 function createIcon(game: TGame, name: string, size: L.PointTuple, className?: string) {
