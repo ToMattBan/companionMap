@@ -2,7 +2,7 @@
   <div id="map" class="gothic_4_map"></div>
   <div :class="[{ 'open': openExtras }, 'destroy_db']">
     <span @click="toggleOpenExtras">{{ openExtras ? '>' : '<' }}</span>
-        <button @click="clearDB">Clear all markers</button>
+    <button @click="clearDB">Clear all markers</button>
   </div>
 </template>
 
