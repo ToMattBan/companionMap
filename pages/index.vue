@@ -35,17 +35,34 @@ h1 {
 
 .game-list {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(1, 1fr);
   gap: 16px;
   padding: 0;
   list-style: none;
   margin: auto;
-  max-width: 1000px;
+  background-color: #2d2c2c;
+  padding: 12px;
+  border-radius: 4px;
+  width: 1000px;
+  max-width: calc(100% - 24px - 16px);
+
+  @media screen and (min-width: 401px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media screen and (min-width: 801px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media screen and (min-width: 1001px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .game-card {
   text-align: center;
   background-color: #3f5535;
+  border-radius: 4px;
 
   a {
     display: flex;
@@ -61,6 +78,7 @@ h1 {
 
   img {
     width: 100%;
+    border-radius: 4px 4px 0px 0px;
   }
 }
 </style>
